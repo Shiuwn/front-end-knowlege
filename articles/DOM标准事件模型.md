@@ -56,3 +56,75 @@ function (){
 
 ##### 传统模型
 
+在传统模型中，事件处理可以在js中添加和删除，但是和行内模型一样，这个处理函数只能添加一个，下面的代码展示了添加事件处理函数和删除的方式：
+```js
+<!doctype html>
+<html lang="en">
+<head>
+	<meta charset="utf-8">
+	<title>Traditional Event Handling</title>
+</head>
+
+<body>
+	<h1>Traditional Event Handling</h1>
+	
+	<p>Hey Joe!</p>
+
+	<script>
+		var triggerAlert = function () {
+			window.alert("Hey Joe");
+		};
+		
+		// Assign an event handler
+		document.onclick = triggerAlert;
+		
+		// Assign another event handler
+		window.onload = triggerAlert;
+		
+		// Remove the event handler that was just assigned
+		window.onload = null;
+	</script>
+</body>
+</html>
+```
+
+当需要为处理函数传递参数时，可以使用闭包的形式。
+
+### DOM Level 2
+
+`W3C`使用了更为灵活的事件处理模型：
+
+- `addEventListener` 添加处理程序
+
+- `removeEventListener` 删除处理程序
+
+- `dispatchEvent` 分发事件给处理程序
+
+
+
+同时还可以调用事件对象的方法，来干预事件的传递和默认事件的触发：
+
+- `stopPropagation()` 阻止事件冒泡
+- `preventDefault()` 阻止目标元素的默认动作执行
+
+> `NOTE`
+
+```
+并不是所有的事件都可以阻止冒泡和取消默认动作
+scroll 事件可以冒泡不可以取消
+blur 和 focus 事件也是无法冒泡和取消的
+Media 事件也不会冒泡，如视频和音频的播放事件
+mouseleave和mouseenter 事件也不会冒泡，但是mouseout和mouseover会触发冒泡
+另外，在传递的Event对象里面可以通过查看 bubbbles 属性知道这个事件是否是一个冒泡事件（true代表是冒泡事件），cancelable 是否可以取消这个事件，eventPhase 事件流的阶段，等等。
+
+参考3 里面指明了哪些事件是可以冒泡，哪些事件是可以取消的
+```
+
+`DOM Level 2` 的事件处理模型允许对目标元素绑定多个事件，还可以指定在捕获或者冒泡阶段处理事件。
+
+> 参考（部分直接翻译）
+>
+> 1. [DOM Events](https://en.wikipedia.org/wiki/DOM_events#Event_flow)
+> 2. [JavaScript中那些不会冒泡的事件](https://zhuanlan.zhihu.com/p/164844013)
+> 3. [Document Object Model Events](https://www.w3.org/TR/DOM-Level-2-Events/events.html#Events-overview)
+
