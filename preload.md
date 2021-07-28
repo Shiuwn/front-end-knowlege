@@ -130,7 +130,7 @@ Link: <https://example.com/other/styles.css>; rel=preload; as=style
 
 从性能面板中可以看到后引入的图片`6.png`，是等到有空闲的下载线程后才加载的。因此在使用中要防止 `preload` 滥用导致重要的资源无法优先加载的问题。
 
-#### `preload` 一些很酷的用法
+### `preload` 一些很酷的用法
 利用`onload` 可以创造很多基于标记的异步加载器，譬如我们可以异步加载 `CSS` 文件而又不阻塞页面的`onload` 事件
 ```HTML
 <link rel="preload" as="style" href="./style.css" onload="this.rel='stylesheet'"/>
