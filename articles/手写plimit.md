@@ -1,6 +1,6 @@
 # 手写p-limit
 
-前段时间公众号上推送了一篇文章，看标题大概是讲如何自己手写一个`p-limit`，本来打算仔细拜读，但是事情太多忘记了，等我有了空闲的时候消息已经积压了很多，已经不方便找了。之前我做过一些并发的优化处理，便自己想着实现一下这个库的核心功能。
+前段时间公众号上推送了一篇文章，看标题大概是讲如何自己实现一个 `p-limit`，本来打算仔细拜读，但是事情太多忘记了，等我有了空闲的时候消息已经积压了很多不方便找了。之前我做过一些并发的优化处理，便想着实现一下这个库的核心功能。
 
 我们先来看这个库大概是怎么使用的。
 
@@ -10,9 +10,15 @@ import pLimit from 'p-limit';
 const limit = pLimit(1);
 
 const input = [
-	limit(() => fetchSomething('foo')),
-	limit(() => fetchSomething('bar')),
-	limit(() => doSomething())
+	limit(() => 
+    fetchSomething('foo')
+  ),
+	limit(() => 
+    fetchSomething('bar')
+  ),
+	limit(() => 
+    doSomething()
+  )
 ];
 
 // Only one promise is run at once
@@ -23,11 +29,13 @@ console.log(result);
 根据`p-limit`给出的代码示例，我们可以先把主要接口的轮廓写出来。
 
 ```ts
-const pLimit = (limit: number) => {
-  return (cb: () => Promise) => {
-    return new Promise((resolve, reject) => {})
-  }
-}
+const pLimit = (limit: number) => 
+  (cb: () => Promise) => 
+    new Promise((resolve, reject) => {
+      
+    })
+  
+
 const limit = pLimit(1)
 const input = [
   limit(() => Promise.resolve(1)),
@@ -37,7 +45,7 @@ const input = [
 ```
 这样就搭好了`p-limit`的基本轮廓。接下来我们来实现核心的功能。
 
-`p-limit`的功能是实现对`Promise`的节流，在我们利用`limit(() => Promise.resolve(1))`这种形式执行代码时，肯定是把待执行的函数加入到一个`调度器`，由这个`调度器`控制并发的执行。接下来我们实现以下这个调度器。
+`p-limit`的功能是实现对`Promise`的节流，在我们利用`limit(() => Promise.resolve(1))`这种形式执行代码时，肯定是把待执行的函数加入到一个`调度器`，由这个`调度器`控制并发的执行。接下来我们实现一下这个调度器。
 
 ```ts
 class Scheduler {
@@ -53,11 +61,17 @@ class Scheduler {
     // 执行环境数组不为空且没有达到并发限制
     while (this.list.length && this.count < this.limit) {
       // 取出执行环境
-      const { callback: cb, resolve, reject } = this.list.shift()
+      const { 
+        callback: cb, 
+        resolve, 
+        reject 
+      } = this.list.shift()
       // 当前执行数量增加
       this.count++
       // 用Promise.resolve兼容callback结果不是Promise的情况
-      Promise.resolve(cb()).then((res) => {
+      Promise
+        .resolve(cb())
+        .then((res) => {
         // 执行成功当前执行数量减少
         this.count--
         // 导出结果
@@ -82,7 +96,11 @@ const pLimit = (count: number = 1) => {
   return function limit<T>(cb: () => (Promise<T> | T)) {
     return new Promise((resolve, reject) => {
       // 添加执行环境
-      scheduler.add({ callback: cb, resolve, reject })
+      scheduler.add({ 
+        callback: cb, 
+        resolve,
+        reject 
+      })
       // 执行调度器
       scheduler.do()
     })
